@@ -20,9 +20,10 @@ export default class Game extends Component {
 
     componentDidMount() {
         const storedState = JSON.parse(localStorage.getItem('state'))
+        const highScore = storedState !== null ? storedState.highScore : 0
         this.setState(prevState => ({
             ...prevState,
-            highScore: storedState.highScore ? storedState.highScore : 0
+            highScore: highScore
         }), () => {
             if (!storedState.board) {
                 this.initGame()
