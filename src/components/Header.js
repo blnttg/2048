@@ -18,9 +18,9 @@ export const Header = (props) => {
                 <div className='flex flex-col items-center mx-1 py-1 px-4 rounded bg-gray-300'>
                     <span className='font-semibold text-gray-800 tracking-tight'>new game</span>
                     <div className='flex justify-around'>
-                        <span className='cursor-pointer mx-1 text-xl font-bold text-green-800' onClick={() => props.newGame(3)}>3x3</span>
-                        <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-blue-800' onClick={() => props.newGame(4)}>4x4</span>
-                        <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-orange-800' onClick={() => props.newGame(5)}>5x5</span>
+                        <span className='cursor-pointer mx-1 text-xl font-bold text-orange-800' onClick={() => props.newGame(3)}>3x3</span>
+                        <span className='cursor-pointer mx-1 text-xl font-bold text-blue-800' onClick={() => props.newGame(4)}>4x4</span>
+                        <span className='cursor-pointer mx-1 text-xl font-bold text-green-800' onClick={() => props.newGame(5)}>5x5</span>
                     </div>
                 </div>
                 <div className='flex'>

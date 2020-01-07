@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Tile } from './Tile'
 import { Header } from './Header'
 import { Overlay } from './Overlay'
+import { Footer } from './Footer'
 
 export default class Game extends Component {
     constructor(props) {
@@ -12,7 +13,7 @@ export default class Game extends Component {
             board: false,
             score: 0,
             gameOver: false,
-            highScore: 0
+            highScore: [0, 0, 0]
         }
         this.initGame = this.initGame.bind(this)
         this.placeNewTile = this.placeNewTile.bind(this)
@@ -20,7 +21,7 @@ export default class Game extends Component {
 
     componentDidMount() {
         const storedState = JSON.parse(localStorage.getItem('state'))
-        const highScore = storedState !== null ? storedState.highScore : 0
+        const highScore = storedState !== null && Array.isArray(storedState.highScore) ? storedState.highScore : [0, 0, 0]
         this.setState(prevState => ({
             ...prevState,
             highScore: highScore
@@ -179,10 +180,13 @@ export default class Game extends Component {
 
     setScore(number) {
         const newScore = this.state.score + number
+        const curHighScore = this.state.highScore[this.state.gridSize - 3]
+        const newHighScore = this.state.highScore.slice()
+        newHighScore[this.state.gridSize - 3] = newScore
         this.setState(prevState => ({
             ...prevState,
             score: newScore,
-            highScore: newScore < prevState.highScore ? prevState.highScore : newScore
+            highScore: newScore < curHighScore ? prevState.highScore : newHighScore
         }))
     }
 
@@ -231,7 +235,7 @@ export default class Game extends Component {
 
 
     render() {
-        const { board, score, highScore, gameOver } = this.state
+        const { board, score, highScore, gameOver, gridSize } = this.state
         let items = []
 
         for (let i = 0; i < board.length; i++) {
@@ -243,13 +247,14 @@ export default class Game extends Component {
         }
 
         return (
-            <div className='flex flex-col items-center bg-gray-200 h-screen'>
-                <Header newGame={this.initGame} score={score} highScore={highScore} />
+            <div className='flex flex-col items-center bg-gray-200 h-screen md:w-screen'>
+                <Header newGame={this.initGame} score={score} highScore={highScore[gridSize - 3]} />
                 <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
                     {board && items}
                     {gameOver ? <Overlay score={score} /> : null}
                 </div>
-                {/* <span className='text-center w-full cursor-pointer p-2 text-sm font-semibold text-orange-800' onClick={() => localStorage.clear()}>clear game data</span> */}
+                {/* <Footer />
+                <span className='text-center w-full cursor-pointer p-2 text-sm font-semibold text-orange-800' onClick={() => localStorage.clear()}>clear local game data</span> */}
             </div>
         )
     }
