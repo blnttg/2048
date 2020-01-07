@@ -2,8 +2,8 @@ import React from 'react'
 
 
 export const Tile = (props) => {
-    const bgClasses = 'flex items-center justify-center h-20 w-20 m-1 rounded select-none ' + colorByValue(props.value).background
-    const fgClasses = 'text-2xl font-black ' + colorByValue(props.value).foreground
+    const bgClasses = 'tile flex items-center justify-center h-20 w-20 m-1 rounded select-none ' + colorByValue(props.value).background
+    const fgClasses = 'text-2xl font-bold ' + colorByValue(props.value).foreground
     return (
         <div className={ bgClasses }>
             <span className={ fgClasses }>
@@ -31,7 +31,6 @@ const colorByValue = (value) => {
             break
         case 8:
             background = 'bg-orange-300'
-            foreground = 'text-gray-800'
             break
         case 16:
             background = 'bg-orange-400'

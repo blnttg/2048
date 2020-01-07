@@ -1,38 +1,53 @@
 import React, { Component } from 'react'
-import 'animate.css'
 import { Tile } from './Tile'
 import { Header } from './Header'
+import { Overlay } from './Overlay'
 
 export default class Game extends Component {
     constructor(props) {
         super(props)
 
         this.state = {
-            gridSize: 3,
+            gridSize: 5,
             board: false,
             score: 0,
-            gameOver: false
+            gameOver: false,
+            highScore: 0
         }
         this.initGame = this.initGame.bind(this)
         this.placeNewTile = this.placeNewTile.bind(this)
     }
 
     componentDidMount() {
-        this.initGame()
+        const storedState = JSON.parse(localStorage.getItem('state'))
+        this.setState(prevState => ({
+            ...prevState,
+            highScore: storedState.highScore ? storedState.highScore : 0
+        }), () => {
+            if (!storedState.board) {
+                this.initGame()
+            }
+            else {
+                this.setState(storedState)
+            }
+        })
+
         document.addEventListener('keydown', e => this.handleKeyDown(e))
     }
 
     // init board by grid size & palce 2 random tiles (2 or 4 only)
-    initGame() {
+    initGame(gridSize = 4) {
         let board = [...Array(this.state.gridSize)].map(e => Array(this.state.gridSize).fill(0))
 
         board = this.placeNewTile(this.placeNewTile(board))
 
         this.setState(prevState => ({
             ...prevState,
-            board: board
+            board: board,
+            score: 0,
+            gameOver: false,
+            gridSize: gridSize
         }))
-        console.log(this.state)
     }
 
     // returns the indices of the empty tiles in
@@ -63,7 +78,7 @@ export default class Game extends Component {
         function slideRow(row) {
             const withoutZeros = row.filter(x => x)
             const onlyZeros = Array(row.length - withoutZeros.length).fill(0)
-    
+
             return withoutZeros.concat(onlyZeros)
         }
 
@@ -80,18 +95,19 @@ export default class Game extends Component {
 
     // combines the tiles
     combine(board) {
-        function combineRow(row) {
+        const combineRow = (row) => {
             let combined = row
             for (let i = 0; i < combined.length - 1; i++) {
                 const tileLeft = combined[i]
                 const tileRight = combined[i + 1]
-    
+
                 if (tileLeft === tileRight) {
                     combined[i] = tileLeft + tileRight
                     combined[i + 1] = 0
+                    this.setScore(tileLeft + tileRight)
                 }
             }
-    
+
             return combined
         }
 
@@ -116,30 +132,81 @@ export default class Game extends Component {
         return rotated
     }
 
+    isOver(board) {
+        const length = board.length
+
+        for (let i = 0; i < length; i++) {
+            for (let j = 0; j < length; j++) {
+                if(board[i][j] === 0) {
+                    return false
+                }
+                else if (i !== length - 1 && board[i][j] === board[i + 1][j]) {
+                    return false
+                }
+                else if (j !== length - 1 && board[i][j] === board[i][j + 1]) {
+                    return false
+                }
+            }            
+        }
+        return true
+    }
+    
     move(direction) {
-        // check for game over
-        let emptyTilesLeft = this.getEmptyTiles(this.state.board).length
-        if (emptyTilesLeft > 0) {
-            // rotate the board to the right direction
-            let board = this.rotate(this.state.board, direction)
-            // slide the tiles in the rows
-            let slided = this.slide(board)
-            // combine the tiles in the rows
-            let combined = this.slide(this.combine(slided))
-            // place new tile & rotate it back to the original direction
-            const moved = this.rotate(this.placeNewTile(combined), 4 - direction)
-            //save it to the state
+        let prevBoard = this.state.board.map((row) => row.slice())
+        // rotate the board to the right direction
+        let movedBoard = this.rotate(prevBoard, direction)
+        // slide the tiles in the rows
+        movedBoard = this.slide(movedBoard)
+        // combine the tiles in the rows
+        movedBoard = this.slide(this.combine(movedBoard))
+        // rotate it back to the original direction
+        movedBoard = this.rotate(movedBoard, 4 - direction)
+        // only add new tile if there is any change on the board
+        if (JSON.stringify(prevBoard) != JSON.stringify(movedBoard)) {
+            movedBoard = this.placeNewTile(movedBoard)
             this.setState(prevState => ({
                 ...prevState,
-                board: moved
-            }))
-        }
-        else {
+                board: movedBoard
+            }), () => localStorage.setItem('state', JSON.stringify(this.state)))
+        } else if (this.isOver(movedBoard)) {
             this.setState(prevState => ({
                 ...prevState,
                 gameOver: true
-            }))
+            }), () => localStorage.setItem('state', JSON.stringify({ highScore: this.state.highScore })))
         }
+    }
+
+    setScore(number) {
+        const newScore = this.state.score + number
+        this.setState(prevState => ({
+            ...prevState,
+            score: newScore,
+            highScore: newScore < prevState.highScore ? prevState.highScore : newScore
+        }))
+    }
+
+    animate(direction) {
+        const tileNodes = document.querySelectorAll('.tile')
+        tileNodes.forEach(node => {
+            if (node.getAttribute('value') != 0) {
+                switch (direction) {
+                    case 0:
+                        node.classList.add('animated', 'faster', 'slideInLeft')
+                        break
+                    case 1:
+                        node.classList.add('animated', 'faster', 'slideInDown')
+                        break
+                    case 2:
+                        node.classList.add('animated', 'faster', 'slideInRight')
+                        break
+                    case 3:
+                        node.classList.add('animated', 'faster', 'slideInUp')
+                        break
+                    default:
+                        break
+                }
+            }
+        })
     }
 
     handleKeyDown(e) {
@@ -161,8 +228,9 @@ export default class Game extends Component {
         }
     }
 
+    
     render() {
-        const { gridSize, board, score } = this.state
+        const { gridSize, board, score, highScore, gameOver } = this.state
         let items = []
 
         for (let i = 0; i < board.length; i++) {
@@ -170,19 +238,15 @@ export default class Game extends Component {
             for (let j = 0; j < board.length; j++) {
                 subItems.push(<Tile value={board[i][j]} key={[i, j, board[i][j]].join('')} />)
             }
-            items.push(<div className='flex' key={i}>{subItems}</div>)
+            items.push(<div className='flex items-center' key={i}>{subItems}</div>)
         }
 
         return (
             <div>
-                <Header newGame={this.initGame} score={score} />
-                <div className='flex flex-col bg-gray-300 rounded p-2'>
-                    { this.state.board && items }
-                    { this.state.gameOver && 
-                        <div className='h-full w-full bg-gray-400'>
-                            <h2 className='text-4xl font-bold text-center'>Game Over!</h2>
-                        </div>
-                    }
+                <Header newGame={ this.initGame } score={ score } highScore={ highScore }/>
+                <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
+                    { board && items }
+                    { gameOver ? <Overlay /> : null }                    
                 </div>
             </div>
         )

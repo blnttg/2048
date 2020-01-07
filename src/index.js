@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
+import 'animate.css'
 import './index.css'
-import { Tile } from './components/Tile'
 import Game from './components/Game'
-// import 'animate.css'
-// import Game from './components/Game'
-
 
 
 class App extends Component {
