@@ -8,7 +8,7 @@ export default class Game extends Component {
         super(props)
 
         this.state = {
-            gridSize: 5,
+            gridSize: 4,
             board: false,
             score: 0,
             gameOver: false,
@@ -25,8 +25,8 @@ export default class Game extends Component {
             ...prevState,
             highScore: highScore
         }), () => {
-            if (!storedState.board) {
-                this.initGame()
+            if (storedState === null || !storedState.board) {
+                this.initGame(this.state.gridSize)
             }
             else {
                 this.setState(storedState)
@@ -48,7 +48,7 @@ export default class Game extends Component {
             score: 0,
             gameOver: false,
             gridSize: gridSize
-        }))
+        }), console.log(this.state))
     }
 
     // returns the indices of the empty tiles in
@@ -247,7 +247,7 @@ export default class Game extends Component {
                 <Header newGame={ this.initGame } score={ score } highScore={ highScore }/>
                 <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
                     { board && items }
-                    { gameOver ? <Overlay /> : null }                    
+                    { gameOver ? <Overlay score={ score } /> : null }                    
                 </div>
             </div>
         )

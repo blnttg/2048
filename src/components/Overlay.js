@@ -2,8 +2,9 @@ import React from 'react'
 
 export const Overlay = (props) => {
     return (
-        <div id='overlay' className='absolute top-0 left-0 h-full w-full z-10 rounded bg-gray-400 animated fadeIn'>
-            <h2 className='text-4xl font-bold text-center'>Game Over!</h2>
+        <div id='overlay' className='flex flex-col items-center justify-center absolute top-0 left-0 h-full w-full z-10 rounded bg-gray-300 animated fadeIn'>
+            <span className='text-4xl font-bold tracking-tighter text-gray-800'>game over!</span>
+            <span className='text-xl font-bold tracking-tighter text-gray-800'>your score: { props.score }</span>
         </div>
     )
 }
