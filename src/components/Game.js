@@ -38,7 +38,7 @@ export default class Game extends Component {
 
     // init board by grid size & palce 2 random tiles (2 or 4 only)
     initGame(gridSize = 4) {
-        let board = [...Array(this.state.gridSize)].map(e => Array(this.state.gridSize).fill(0))
+        let board = [...Array(gridSize)].map(e => Array(gridSize).fill(0))
 
         board = this.placeNewTile(this.placeNewTile(board))
 
@@ -48,7 +48,7 @@ export default class Game extends Component {
             score: 0,
             gameOver: false,
             gridSize: gridSize
-        }), console.log(this.state))
+        }))
     }
 
     // returns the indices of the empty tiles in
@@ -138,7 +138,7 @@ export default class Game extends Component {
 
         for (let i = 0; i < length; i++) {
             for (let j = 0; j < length; j++) {
-                if(board[i][j] === 0) {
+                if (board[i][j] === 0) {
                     return false
                 }
                 else if (i !== length - 1 && board[i][j] === board[i + 1][j]) {
@@ -147,11 +147,11 @@ export default class Game extends Component {
                 else if (j !== length - 1 && board[i][j] === board[i][j + 1]) {
                     return false
                 }
-            }            
+            }
         }
         return true
     }
-    
+
     move(direction) {
         let prevBoard = this.state.board.map((row) => row.slice())
         // rotate the board to the right direction
@@ -229,9 +229,9 @@ export default class Game extends Component {
         }
     }
 
-    
+
     render() {
-        const { gridSize, board, score, highScore, gameOver } = this.state
+        const { board, score, highScore, gameOver } = this.state
         let items = []
 
         for (let i = 0; i < board.length; i++) {
@@ -244,11 +244,12 @@ export default class Game extends Component {
 
         return (
             <div>
-                <Header newGame={ this.initGame } score={ score } highScore={ highScore }/>
+                <Header newGame={this.initGame} score={score} highScore={highScore} />
                 <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
-                    { board && items }
-                    { gameOver ? <Overlay score={ score } /> : null }                    
+                    {board && items}
+                    {gameOver ? <Overlay score={score} /> : null}
                 </div>
+                {/* <span className='text-center w-full cursor-pointer p-2 text-sm font-semibold text-orange-800' onClick={() => localStorage.clear()}>clear game data</span> */}
             </div>
         )
     }

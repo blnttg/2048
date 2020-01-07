@@ -19,9 +19,8 @@ export const Header = (props) => {
                     <span className='font-semibold text-gray-800 tracking-tight'>new game</span>
                     <div className='flex justify-around'>
                         <span className='cursor-pointer mx-1 text-xl font-bold text-green-800' onClick={() => props.newGame(3)}>3x3</span>
-                        <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-blue-800' onClick={() => props.newGame}>4x4</span>
+                        <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-blue-800' onClick={() => props.newGame(4)}>4x4</span>
                         <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-orange-800' onClick={() => props.newGame(5)}>5x5</span>
-                        <span className='cursor-pointer mx-1 text-xl font-bold text-gray-800 text-orange-800' onClick={() => localStorage.clear()}>clear</span>
                     </div>
                 </div>
                 <div className='flex'>
