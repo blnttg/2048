@@ -243,7 +243,7 @@ export default class Game extends Component {
         }
 
         return (
-            <div>
+            <div className='flex flex-col items-center bg-gray-200 h-screen'>
                 <Header newGame={this.initGame} score={score} highScore={highScore} />
                 <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
                     {board && items}
