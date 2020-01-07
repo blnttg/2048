@@ -13,7 +13,9 @@ export default class Game extends Component {
             board: false,
             score: 0,
             gameOver: false,
-            highScore: [0, 0, 0]
+            highScore: [0, 0, 0],
+            touchInitX: null,
+            touchInitY: null
         }
         this.initGame = this.initGame.bind(this)
         this.placeNewTile = this.placeNewTile.bind(this)
@@ -35,6 +37,10 @@ export default class Game extends Component {
         })
 
         document.addEventListener('keydown', e => this.handleKeyDown(e))
+
+        const boardArea = document.getElementById('board')
+        boardArea.addEventListener("touchstart", e => this.startTouch(e))
+        boardArea.addEventListener("touchmove", e => this.moveTouch(e))
     }
 
     // init board by grid size & palce 2 random tiles (2 or 4 only)
@@ -190,30 +196,6 @@ export default class Game extends Component {
         }))
     }
 
-    animate(direction) {
-        const tileNodes = document.querySelectorAll('.tile')
-        tileNodes.forEach(node => {
-            if (node.getAttribute('value') != 0) {
-                switch (direction) {
-                    case 0:
-                        node.classList.add('animated', 'faster', 'slideInLeft')
-                        break
-                    case 1:
-                        node.classList.add('animated', 'faster', 'slideInDown')
-                        break
-                    case 2:
-                        node.classList.add('animated', 'faster', 'slideInRight')
-                        break
-                    case 3:
-                        node.classList.add('animated', 'faster', 'slideInUp')
-                        break
-                    default:
-                        break
-                }
-            }
-        })
-    }
-
     handleKeyDown(e) {
         switch (e.keyCode) {
             case 37: // arrow left
@@ -233,6 +215,60 @@ export default class Game extends Component {
         }
     }
 
+    startTouch(e) {
+        this.setState(prevState => ({
+            ...prevState,
+            touchInitX: e.touches[0].clientX,
+            touchInitY: e.touches[0].clientY
+        }))
+    }
+
+    moveTouch(e) {
+        const initX = this.state.touchInitX
+        const initY = this.state.touchInitY
+
+        if (initX === null || initY === null) {
+            return
+        }
+
+        var curX = e.touches[0].clientX
+        var curY = e.touches[0].clientY
+
+        var diffX = initX - curX
+        var diffY = initY - curY
+
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            // sliding horizontally
+            if (diffX > 0) {
+                // swiped left
+                console.log('left')
+                this.move(0)
+            } else {
+                // swiped right
+                console.log('right')
+                this.move(2)
+            }
+        } else {
+            // sliding vertically
+            if (diffY > 0) {
+                // swiped up
+                console.log('up')
+                this.move(1)
+            } else {
+                // swiped down
+                console.log('down')
+                this.move(3)
+            }
+        }
+
+        this.setState(prevState => ({
+            ...prevState,
+            touchInitX: null,
+            touchInitY: null
+        }))
+
+        e.preventDefault()
+    }
 
     render() {
         const { board, score, highScore, gameOver, gridSize } = this.state
@@ -249,7 +285,7 @@ export default class Game extends Component {
         return (
             <div className='flex flex-col items-center bg-gray-200 h-screen md:w-screen'>
                 <Header newGame={this.initGame} score={score} highScore={highScore[gridSize - 3]} />
-                <div className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
+                <div id='board' className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
                     {board && items}
                     {gameOver ? <Overlay score={score} /> : null}
                 </div>
