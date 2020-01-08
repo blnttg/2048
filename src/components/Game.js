@@ -131,7 +131,6 @@ export default class Game extends Component {
                     this.setScore(tileLeft + tileRight)
                 }
             }
-
             return combined
         }
 
@@ -289,8 +288,8 @@ export default class Game extends Component {
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
 
-        const clientWidth = board.offsetWidth
-        const clientHeight = board.offsetHeight
+        const clientWidth = area.offsetWidth
+        const clientHeight = area.offsetHeight
 
         if (clientHeight < windowHeight && clientWidth < windowWidth) {
             area.style.transform = ''
@@ -307,8 +306,6 @@ export default class Game extends Component {
             area.style.msTransform = 'scale(' + scale + ')'
             area.style.OTransform = 'scale(' + scale + ')'
         }
-
-
     }
 
     render() {
