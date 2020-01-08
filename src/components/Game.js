@@ -46,8 +46,8 @@ export default class Game extends Component {
         // add event listeners for game controls
         document.addEventListener('keydown', e => this.handleKeyDown(e))
 
-        boardArea.addEventListener("touchstart", e => this.startTouch(e))
-        boardArea.addEventListener("touchmove", e => this.moveTouch(e))
+        boardArea.addEventListener("touchstart", e => this.handleTouchStart(e))
+        boardArea.addEventListener("touchmove", e => this.handleTouchMove(e))
     }
 
     componentDidUpdate() {
@@ -232,7 +232,7 @@ export default class Game extends Component {
         }
     }
 
-    startTouch(e) {
+    handleTouchStart(e) {
         this.setState(prevState => ({
             ...prevState,
             touchInitX: e.touches[0].clientX,
@@ -240,9 +240,10 @@ export default class Game extends Component {
         }))
     }
 
-    moveTouch(e) {
+    handleTouchMove(e) {
         const initX = this.state.touchInitX
         const initY = this.state.touchInitY
+
 
         if (initX === null || initY === null) {
             return
@@ -258,22 +259,18 @@ export default class Game extends Component {
             // sliding horizontally
             if (diffX > 0) {
                 // swiped left
-                console.log('left')
                 this.move(0)
             } else {
                 // swiped right
-                console.log('right')
                 this.move(2)
             }
         } else {
             // sliding vertically
             if (diffY > 0) {
                 // swiped up
-                console.log('up')
                 this.move(1)
             } else {
                 // swiped down
-                console.log('down')
                 this.move(3)
             }
         }
@@ -290,20 +287,24 @@ export default class Game extends Component {
     fitToScreen(area) {
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
-        const baseRem = 16
 
-        const clientWidth = board.offsetWidth //* baseRem
-        const clientHeight = board.offsetHeight //* baseRem
-
-        console.log(clientHeight)
-        console.log(clientWidth)
+        const clientWidth = board.offsetWidth
+        const clientHeight = board.offsetHeight
 
         if (clientHeight < windowHeight && clientWidth < windowWidth) {
             area.style.transform = ''
+            area.style.webkitTransform = ''
+            area.style.MozTransform = ''
+            area.style.msTransform = ''
+            area.style.OTransform = ''
         }
         else {
             const scale = Math.min(windowWidth / clientWidth, windowHeight / clientHeight)
             area.style.transform = 'scale(' + scale + ')'
+            area.style.webkitTransform = 'scale(' + scale + ')'
+            area.style.MozTransform = 'scale(' + scale + ')'
+            area.style.msTransform = 'scale(' + scale + ')'
+            area.style.OTransform = 'scale(' + scale + ')'
         }
 
 
@@ -326,7 +327,7 @@ export default class Game extends Component {
                 <Header newGame={this.initGame} score={score} highScore={highScore[gridSize - 3]} />
                 <div id='board' className='relative flex items-center flex-col bg-gray-300 rounded p-2 m-2'>
                     {board && items}
-                    {gameOver ? <Overlay score={score} /> : null}
+                    {gameOver ? <Overlay score={score} highScore={highScore[gridSize - 3]} /> : null}
                 </div>
             </div>
         )

@@ -14,7 +14,6 @@ export const Header = (props) => {
         <div className='flex flex-col p-2 select-none'>
             <h1 className='text-5xl text-center font-bold sm:p-1 p-5 text-gray-700'>2048</h1>
             <div className='flex justify-between'>
-                {/* <button className='text-xl font-bold' onClick={props.newGame}>New Game</button> */}
                 <div className='flex flex-col items-center mx-1 py-1 px-4 rounded bg-gray-300'>
                     <span className='font-semibold text-gray-800 tracking-tight'>new game</span>
                     <div className='flex justify-around'>
