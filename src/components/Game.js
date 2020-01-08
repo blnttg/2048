@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Tile } from './Tile'
 import { Header } from './Header'
 import { Overlay } from './Overlay'
-import { Footer } from './Footer'
 
 export default class Game extends Component {
     constructor(props) {
@@ -22,6 +21,7 @@ export default class Game extends Component {
     }
 
     componentDidMount() {
+        // load last game and highscore back from localstorage
         const storedState = JSON.parse(localStorage.getItem('state'))
         const highScore = storedState !== null && Array.isArray(storedState.highScore) ? storedState.highScore : [0, 0, 0]
         this.setState(prevState => ({
@@ -36,11 +36,27 @@ export default class Game extends Component {
             }
         })
 
+        // get the board element from DOM
+        const boardArea = document.getElementById('board')
+
+        // scale down the board if needed
+        this.fitToScreen(boardArea)
+        this.fitToScreen(document.getElementById('app'))
+
+        // add event listeners for game controls
         document.addEventListener('keydown', e => this.handleKeyDown(e))
 
-        const boardArea = document.getElementById('board')
         boardArea.addEventListener("touchstart", e => this.startTouch(e))
         boardArea.addEventListener("touchmove", e => this.moveTouch(e))
+    }
+
+    componentDidUpdate() {
+        // get the board element from DOM
+        const boardArea = document.getElementById('board')
+
+        // scale down the board if needed
+        this.fitToScreen(boardArea)
+        this.fitToScreen(document.getElementById('app'))
     }
 
     // init board by grid size & palce 2 random tiles (2 or 4 only)
@@ -140,6 +156,7 @@ export default class Game extends Component {
         return rotated
     }
 
+    // checks for game over
     isOver(board) {
         const length = board.length
 
@@ -270,6 +287,28 @@ export default class Game extends Component {
         e.preventDefault()
     }
 
+    fitToScreen(area) {
+        const windowWidth = window.innerWidth
+        const windowHeight = window.innerHeight
+        const baseRem = 16
+
+        const clientWidth = board.offsetWidth //* baseRem
+        const clientHeight = board.offsetHeight //* baseRem
+
+        console.log(clientHeight)
+        console.log(clientWidth)
+
+        if (clientHeight < windowHeight && clientWidth < windowWidth) {
+            area.style.transform = ''
+        }
+        else {
+            const scale = Math.min(windowWidth / clientWidth, windowHeight / clientHeight)
+            area.style.transform = 'scale(' + scale + ')'
+        }
+
+
+    }
+
     render() {
         const { board, score, highScore, gameOver, gridSize } = this.state
         let items = []
@@ -283,14 +322,12 @@ export default class Game extends Component {
         }
 
         return (
-            <div className='flex flex-col items-center bg-gray-200 h-screen md:w-screen'>
+            <div className='flex flex-col items-center'>
                 <Header newGame={this.initGame} score={score} highScore={highScore[gridSize - 3]} />
-                <div id='board' className='relative flex items-center flex-col bg-gray-300 rounded p-2'>
+                <div id='board' className='relative flex items-center flex-col bg-gray-300 rounded p-2 m-2'>
                     {board && items}
                     {gameOver ? <Overlay score={score} /> : null}
                 </div>
-                {/* <Footer />
-                <span className='text-center w-full cursor-pointer p-2 text-sm font-semibold text-orange-800' onClick={() => localStorage.clear()}>clear local game data</span> */}
             </div>
         )
     }
