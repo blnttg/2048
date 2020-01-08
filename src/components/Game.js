@@ -238,6 +238,7 @@ export default class Game extends Component {
             touchInitX: e.touches[0].clientX,
             touchInitY: e.touches[0].clientY
         }))
+        e.preventDefault()
     }
 
     handleTouchMove(e) {
